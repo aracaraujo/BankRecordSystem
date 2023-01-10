@@ -15,15 +15,24 @@ using namespace std;
 int main() {
 //    main_menu_options();
     sqlite3* DB;
+    string sql = "CREATE TABLE CLIENT("
+                 "ID INT PRIMARY KEY NOT NULL, "
+                 "FNAME          TEXT NOT NULL, "
+                 "LNAME          TEXT NOT NULL, "
+                 "AGE            INT  NOT NULL, "
+                 "ADDRESS        CHAR(50) NOT NULL, "
+                 "BALANCE        MONEY NOT NULL );";
     int exit;
     exit = sqlite3_open("bank_record", &DB);
+    char* messageError;
+    exit = sqlite3_exec(DB, sql.c_str(), nullptr, nullptr, &messageError);
 
-    if(exit) {
-        cerr << "Error open DB " << sqlite3_errmsg(DB) << endl;
-        return -1;
+    if(exit != SQLITE_OK) {
+        cerr << "Error creating table " << sqlite3_errmsg(DB) << endl;
+        sqlite3_free(messageError);
     }
     else {
-        cout << "Database Opened Successfully" << endl;
+        cout << "Table Created Successfully" << endl;
     }
     sqlite3_close(DB);
     return 0;

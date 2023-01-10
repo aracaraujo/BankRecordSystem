@@ -1,7 +1,8 @@
 # Overview
 
-SQLite3 in MacOS - https://flaviocopes.com/sqlite-how-to-install/
+SQLite3 in MacOS - https://www.devdungeon.com/content/compiling-sqlite3-c
 SQLite3 in Windows and Linux - https://www.geeksforgeeks.org/introduction-to-sqlite/
+
 
 {Important!  Do not say in this section that this is college assignment.  Talk about what you are trying to accomplish as a software engineer to further your learning.}
 
