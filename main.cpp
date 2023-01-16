@@ -28,9 +28,9 @@ static int callback(void* data, int argc, char** argv, char** azColName){
 }
 
 int main() {
-//    main_menu_options();
     int exit;
     sqlite3 *DB = nullptr;
+    // Creating the database and then if there's no issues it will open the database.
     string query = "SELECT * FROM CLIENT;";
     exit = create_database();
     if (exit){
@@ -39,7 +39,14 @@ int main() {
     }
     else{
         cout << "Error database" << endl;
+        printf("\n\tLaunch the software again.");
+        cin.get();
+        return -1;
     }
+
+
+
+
 
     cout << "\n";
 
@@ -272,8 +279,13 @@ void create_client_table(sqlite3* &DB){
           "BALANCE        MONEY NOT NULL );";
     exit = sqlite3_exec(DB, sql, nullptr, nullptr, &messageError);
     if(exit != SQLITE_OK) {
-        cerr << "Error creating table " << sqlite3_errmsg(DB) << endl;
-        sqlite3_free(messageError);
+        string answer = sqlite3_errmsg(DB);
+        if(answer == "table CLIENT already exists"){
+            cout << "CLIENT Table is ready." << endl;
+        }else{
+            cerr  << sqlite3_errmsg(DB) << endl;
+            sqlite3_free(messageError);
+        }
     }
     else {
         cout << "Table Created Successfully" << endl;
@@ -286,17 +298,14 @@ void insert_client(sqlite3* &DB){
     float balance = 0;
     printf("First Name: ");
     getline(cin, first_name);
-//    cin >> first_name;
     printf("Last Name: ");
     getline(cin, last_name);
-//    cin >> last_name;
     printf("Age: ");
     cin >> age;
     cin.clear();
     cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     printf("Address: ");
     getline(cin, address);
-//    cin >> address;
     printf("Balance: ");
     cin >> balance;
     cin.clear();
