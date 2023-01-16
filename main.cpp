@@ -10,7 +10,7 @@ void show_records();
 void update_record();
 void delete_record();
 int create_database();
-int create_client_table(sqlite3* &DB);
+void create_client_table(sqlite3* &DB);
 void insert_client(sqlite3* &DB);
 
 using namespace std;
@@ -30,64 +30,24 @@ static int callback(void* data, int argc, char** argv, char** azColName){
 int main() {
 //    main_menu_options();
     int exit;
-    sqlite3* DB;
-    char* messageError;
-    const char *sql;
-    string query = "SELECT * FROM CLIENT;";
-
-    exit = sqlite3_open("bank_record", &DB);
-    if (exit) {
-        std::cerr << "Error open DB " << sqlite3_errmsg(DB) << std::endl;
-
+    sqlite3 *DB = nullptr;
+    string query = "SELECT rowid,fname,lname FROM CLIENT;";
+    exit = create_database();
+    if (exit){
+        cout << "Database opened" << endl;
+        sqlite3_open("bank_record", &DB);
     }
     else{
-        cout << "Database is open" << endl;
-        cout << "\n" << endl;
+        cout << "Error database" << endl;
     }
 
-    sql = "CREATE TABLE CLIENT("
-                       "ID INT PRIMARY KEY NOT NULL, "
-                       "FNAME          TEXT NOT NULL, "
-                       "LNAME          TEXT NOT NULL, "
-                       "AGE            INT  NOT NULL, "
-                       "ADDRESS        CHAR(50) NOT NULL, "
-                       "BALANCE        MONEY NOT NULL );";
-    exit = sqlite3_exec(DB, sql, nullptr, nullptr, &messageError);
-    if(exit != SQLITE_OK) {
-        cerr << "Error creating table " << sqlite3_errmsg(DB) << endl;
-        sqlite3_free(messageError);
-    }
-    else {
-        cout << "Table Created Successfully" << endl;
-    }
-    cout << "\n" << endl;
-    sql = ("INSERT INTO CLIENT VALUES(1, 'ARA', 'ARAUJO', 24, '175 W', 150.0);");
-    const char *sql1 = ("INSERT INTO CLIENT VALUES(2, 'BREANNA', 'ARAUJO', 24, '175 W', 200.0);");
-    const char *sql2 = ("INSERT INTO CLIENT VALUES(3, 'BRANDON', 'TEST', 24, '195 W', 100.0);");
-    cout << sql2 << endl;
-    int id = 4;
-    int age = 42;
-    const char *fname = "test";
-    const char *lname = "test2";
-    const char *address = "test3";
-    int balance = 123;
-    string sql3;
-    sql3 = "INSERT INTO CLIENT VALUES(" + to_string(id) + ", '" + fname + "', '" + lname + "', " + to_string(age) + ", '" + address + "', " +
-            to_string(balance) + ");";
+    cout << "\n";
 
-    exit = sqlite3_exec(DB, sql, nullptr, nullptr, &messageError);
-    exit = sqlite3_exec(DB, sql1, nullptr, nullptr, &messageError);
-//    exit = sqlite3_exec(DB, sql2, nullptr, nullptr, &messageError);
-//    exit = sqlite3_exec(DB,sql3.c_str(), nullptr, nullptr, &messageError);
-    cout << sql3 << endl;
+    create_client_table(DB);
 
-    if(exit != SQLITE_OK) {
-        cerr << "Error Insert " << sqlite3_errmsg(DB) << endl;
-        sqlite3_free(messageError);
-    }
-    else {
-        cout << "Records created successfully" << endl;
-    }
+    cout << "\n";
+
+    insert_client(DB);
 
     cout << "\n" << endl;
 
@@ -286,28 +246,27 @@ void show_records(){
 }
 void update_record(){}
 void delete_record(){}
-int creating_database(){
+int create_database(){
     int exit;
     sqlite3* DB;
-
     exit = sqlite3_open("bank_record", &DB);
     if (exit) {
         std::cerr << "Error open DB " << sqlite3_errmsg(DB) << std::endl;
-        return -1;
+        return 0;
     }
     else{
         sqlite3_close(DB);
-        return 0;
+        return -1;
     }
 }
-int create_client_table(sqlite3* &DB){
+void create_client_table(sqlite3* &DB){
     int exit;
     char* messageError;
     const char *sql;
     sql = "CREATE TABLE CLIENT("
-          "ID INT PRIMARY KEY NOT NULL, "
-          "FNAME          TEXT NOT NULL, "
-          "LNAME          TEXT NOT NULL, "
+          "PERSON_ID INTEGER PRIMARY KEY, "
+          "FIRST_NAME          TEXT NOT NULL, "
+          "LAST_NAME          TEXT NOT NULL, "
           "AGE            INT  NOT NULL, "
           "ADDRESS        CHAR(50) NOT NULL, "
           "BALANCE        MONEY NOT NULL );";
@@ -319,18 +278,24 @@ int create_client_table(sqlite3* &DB){
     else {
         cout << "Table Created Successfully" << endl;
     }
-};
+}
 void insert_client(sqlite3* &DB){
-    int exit;
     char* error_message;
-    int id = 4;
-    int age = 42;
-    const char *first_name = "test";
-    const char *last_name = "test2";
-    const char *address = "test3";
-    float balance = 123;
+    int id, age, exit;
+    string first_name, last_name, address;
+    float balance = 0;
+    printf("First Name: ");
+    cin >> first_name;
+    printf("Last Name: ");
+    cin >> last_name;
+    printf("Age: ");
+    cin >> age;
+    printf("Address: ");
+    cin >> address;
+    printf("Balance: ");
+    cin >> balance;
     string sql;
-    sql = "INSERT INTO CLIENT VALUES(" + to_string(id) + ", '" + first_name + "', '" + last_name + "', " + to_string(age) + ", '" + address + "', " +
+    sql = "INSERT INTO CLIENT (FIRST_NAME,LAST_NAME,AGE,ADDRESS,BALANCE) VALUES( '" + first_name + "', '" + last_name + "', " + to_string(age) + ", '" + address + "', " +
           to_string(balance) + ");";
 
     exit = sqlite3_exec(DB, sql.c_str(), nullptr, nullptr, &error_message);;
