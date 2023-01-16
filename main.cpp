@@ -3,7 +3,6 @@
 #include <cstdio>
 #include <random>
 
-
 void main_menu_options();
 void search_record();
 void show_records();
@@ -22,10 +21,10 @@ using namespace std;
 static int callback(void* data, int argc, char** argv, char** azColName){
     int i;
 //    fprintf(stderr, "%s: ", (const char*)data);
-    printf("\n");
+    printf("\n\t");
 
     for (i = 0; i< argc; i++){
-        printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
+        printf("%s = %s\n\t", azColName[i], argv[i] ? argv[i] : "NULL");
     }
     printf("\n");
     return 0;
@@ -54,11 +53,6 @@ int main() {
 
     main_menu_options();
 
-    sqlite3 *DB = nullptr;
-    sqlite3_open("bank_record", &DB);
-    sqlite3_exec(DB, query.c_str(),callback, nullptr, nullptr);
-    sqlite3_close(DB);
-    // Closing the Database when the program is closed.
     return 0;
 }
 
@@ -125,16 +119,18 @@ void search_record(){
     //Booking menu.
     //This menu has the reservations options. It will allow an employee to create, edit, and delete a
     //reservation. It is linked to the reservation table in the database.
-    bool program_controler = true;
+    bool program_control = true;
     int option;
-    while (program_controler) {
+    sqlite3 *DB = nullptr;
+    sqlite3_open("bank_record", &DB);
+    while (program_control) {
         system("clear");
-        printf("\n\t           Booking Menu\n");
+        printf("\n\t           Search Record\n");
         printf("\n\t=================================\n");
         printf("\n\tChoose between the options below:\n");
-        printf("\t1. Make a new reservation\n");
-        printf("\t2. Edit a reservation\n");
-        printf("\t3. Cancel a reservation\n");
+        printf("\t1. Search by First Name\n");
+        printf("\t2. Search by Last Name\n");
+        printf("\t3. Search by ID\n");
         printf("\t4. Exit\n");
         printf("\tOption: ");
         if (!(cin >> option)) {
@@ -146,29 +142,53 @@ void search_record(){
         cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         switch (option) {
             case 1: {
-                printf("Making a new reservation");
+                string first_name;
+                printf("\n\tFirst Name: ");
+                getline(cin,first_name);
+                string query = "SELECT * FROM CLIENT WHERE FIRST_NAME='"+ first_name + "';";
+                system("clear");
+                sqlite3_exec(DB,query.c_str(), callback, nullptr, nullptr);
+                printf("\n\tPress Enter to go back to client menu");
+                cin.get();
                 break;
             }
             case 2: {
-                printf("Editing a reservation");
+                string last_name;
+                printf("\n\tLast Name: ");
+                getline(cin,last_name);
+                string query = "SELECT * FROM CLIENT WHERE LAST_NAME='"+ last_name + "';";
+                system("clear");
+                sqlite3_exec(DB,query.c_str(), callback, nullptr, nullptr);
+                printf("\n\tPress Enter to go back to client menu");
+                cin.get();
                 break;
             }
             case 3: {
-                printf("Canceling a reservation");
+                int client_id;
+                printf("\n\tClient ID: ");
+                cin >> client_id;
+                cin.clear();
+                cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                string query = "SELECT * FROM CLIENT WHERE PERSON_ID="+ to_string(client_id) + ";";
+                system("clear");
+                sqlite3_exec(DB,query.c_str(), callback, nullptr, nullptr);
+                printf("\n\tPress Enter to go back to client menu");
+                cin.get();
                 break;
             }
             case 4: {
-                program_controler = false;
+                program_control = false;
                 break;
             }
             default: {
                 printf("\nThis is not a proper option.");
-                printf("\nPress Enter to go back to client menu");
+                printf("\nPress Enter to go back to the search menu");
                 cin.get();
                 continue;
             }
         }
     }
+    sqlite3_close(DB);
 }
 void show_records(){
     //Flights menu.
@@ -275,7 +295,7 @@ void add_client(){
     uniform_int_distribution<> dist(1000,9999);
     client_id = dist(gen);
     system("clear");
-    printf("\n\t         New Client Information\n");
+    printf("\n\t        New Client Information\n");
     printf("\n\t========================================\n");
     printf("\n\tClient ID: %d\n",client_id);
     printf("\n\tFirst Name: ");
@@ -303,10 +323,13 @@ void add_client(){
         sqlite3_free(error_message);
     }
     else {
-        cout << "\n\tRecord created successfully" << endl;
+        system("clear");
+        cout << "\n\tThe Following Record Was Created Successfully:" << endl;
+        string query = "SELECT * FROM CLIENT WHERE PERSON_ID="+ to_string(client_id) + ";";
+        sqlite3_exec(DB,query.c_str(), callback, nullptr, nullptr);
     }
-    string query = "SELECT * FROM CLIENT;";
     printf("\n\tPress Enter to go back to client menu");
     cin.get();
     sqlite3_close(DB);
 }
+
