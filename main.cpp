@@ -31,7 +31,7 @@ int main() {
 //    main_menu_options();
     int exit;
     sqlite3 *DB = nullptr;
-    string query = "SELECT rowid,fname,lname FROM CLIENT;";
+    string query = "SELECT * FROM CLIENT;";
     exit = create_database();
     if (exit){
         cout << "Database opened" << endl;
@@ -281,19 +281,26 @@ void create_client_table(sqlite3* &DB){
 }
 void insert_client(sqlite3* &DB){
     char* error_message;
-    int id, age, exit;
+    int age, exit;
     string first_name, last_name, address;
     float balance = 0;
     printf("First Name: ");
-    cin >> first_name;
+    getline(cin, first_name);
+//    cin >> first_name;
     printf("Last Name: ");
-    cin >> last_name;
+    getline(cin, last_name);
+//    cin >> last_name;
     printf("Age: ");
     cin >> age;
+    cin.clear();
+    cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     printf("Address: ");
-    cin >> address;
+    getline(cin, address);
+//    cin >> address;
     printf("Balance: ");
     cin >> balance;
+    cin.clear();
+    cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     string sql;
     sql = "INSERT INTO CLIENT (FIRST_NAME,LAST_NAME,AGE,ADDRESS,BALANCE) VALUES( '" + first_name + "', '" + last_name + "', " + to_string(age) + ", '" + address + "', " +
           to_string(balance) + ");";
