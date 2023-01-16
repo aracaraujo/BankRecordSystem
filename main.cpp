@@ -1,17 +1,21 @@
 #include <iostream>
 #include <sqlite3.h>
 #include <cstdio>
+#include <random>
 
 
 void main_menu_options();
-void add_record();
 void search_record();
 void show_records();
 void update_record();
 void delete_record();
 int create_database();
-void create_client_table(sqlite3* &DB);
-void insert_client(sqlite3* &DB);
+void create_client_table();
+void add_client();
+
+namespace {
+    std::random_device rd;
+    std::mt19937 gen(rd());}
 
 using namespace std;
 
@@ -29,46 +33,40 @@ static int callback(void* data, int argc, char** argv, char** azColName){
 
 int main() {
     int exit;
-    sqlite3 *DB = nullptr;
     // Creating the database and then if there's no issues it will open the database.
     string query = "SELECT * FROM CLIENT;";
     exit = create_database();
     if (exit){
-        cout << "Database opened" << endl;
-        sqlite3_open("bank_record", &DB);
+        cout << "\n\tThe Database is Open" << endl;
     }
     else{
-        cout << "Error database" << endl;
-        printf("\n\tLaunch the software again.");
+        cout << "\n\tError Database" << endl;
+        printf("\n\tLaunch The Software Again.");
         cin.get();
         return -1;
     }
+    // Creating CLIENT table. If the table already exists it will tell that the table is ready.
+    create_client_table();
 
-
-
-
-
-    cout << "\n";
-
-    create_client_table(DB);
+    system("clear");
 
     cout << "\n";
 
-    insert_client(DB);
+    main_menu_options();
 
-    cout << "\n" << endl;
-
-    sqlite3_exec(DB, query.c_str(), callback, nullptr, nullptr);
-
+    sqlite3 *DB = nullptr;
+    sqlite3_open("bank_record", &DB);
+    sqlite3_exec(DB, query.c_str(),callback, nullptr, nullptr);
     sqlite3_close(DB);
+    // Closing the Database when the program is closed.
     return 0;
 }
 
 void main_menu_options(){
     // Displays the main menu when the system is initiated.
-    bool program_controler = true;
+    bool program_control = true;
     int option;
-    while (program_controler) {
+    while (program_control) {
         system("clear");
         printf("\n\t         Bank System Information\n");
         printf("\n\t========================================\n");
@@ -89,7 +87,7 @@ void main_menu_options(){
         cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         switch (option) {
             case 1: {
-                add_record();
+                add_client();
                 break;
             }
             case 2: {
@@ -109,8 +107,8 @@ void main_menu_options(){
                 break;
             }
             case 6: {
-                printf("Have a great day!");
-                program_controler = false;
+                printf("\n\tHave a great day!");
+                program_control = false;
                 break;
             }
             default: {
@@ -121,36 +119,6 @@ void main_menu_options(){
                 continue;
             }
         }
-    }
-}
-void add_record(){
-    //Client menu.
-    //This menu has options regarding the client information. It will allow an employee to add, edit, and delete a
-    //client. It is linked to the client table in the database.
-    bool program_controler = true;
-    string fname, lname, address;
-    int age;
-    float balance;
-    while (program_controler) {
-        system("clear");
-        printf("\n\t         Adding new client\n");
-        printf("\n\t=================================\n");
-        printf("\n\tEnter the following information\n");
-        printf("\tFirst Name: ");
-        getline(cin,fname);
-        printf("\n\tLast Name: ");
-        getline(cin,lname);
-        printf("\n\tAddress: ");
-        getline(cin,address);
-        printf("\n\tAge: ");
-        cin >> age;
-        printf("\n\tBalance: ");
-        cin >> balance;
-        cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        printf("\n\tAccount created successfully!");
-        printf("\n\tPress Enter to go back to menu");
-        cin.get();
-        program_controler = false;
     }
 }
 void search_record(){
@@ -266,12 +234,14 @@ int create_database(){
         return -1;
     }
 }
-void create_client_table(sqlite3* &DB){
+void create_client_table(){
+    sqlite3 *DB = nullptr;
+    sqlite3_open("bank_record", &DB);
     int exit;
     char* messageError;
     const char *sql;
     sql = "CREATE TABLE CLIENT("
-          "PERSON_ID INTEGER PRIMARY KEY, "
+          "PERSON_ID INTEGER PRIMARY KEY NOT NULL, "
           "FIRST_NAME          TEXT NOT NULL, "
           "LAST_NAME          TEXT NOT NULL, "
           "AGE            INT  NOT NULL, "
@@ -281,46 +251,62 @@ void create_client_table(sqlite3* &DB){
     if(exit != SQLITE_OK) {
         string answer = sqlite3_errmsg(DB);
         if(answer == "table CLIENT already exists"){
-            cout << "CLIENT Table is ready." << endl;
+            cout << "\n\tCLIENT Table is ready." << endl;
         }else{
-            cerr  << sqlite3_errmsg(DB) << endl;
+            system("clear");
+            cerr << "\n\t" << sqlite3_errmsg(DB) << endl;
             sqlite3_free(messageError);
+            printf("\n\tLaunch The Software Again.");
+            cin.get();
         }
     }
     else {
-        cout << "Table Created Successfully" << endl;
+        cout << "\n\tTable Created Successfully" << endl;
     }
+    sqlite3_close(DB);
 }
-void insert_client(sqlite3* &DB){
+void add_client(){
+    sqlite3 *DB = nullptr;
+    sqlite3_open("bank_record", &DB);
     char* error_message;
-    int age, exit;
+    int client_id,age, exit;
     string first_name, last_name, address;
     float balance = 0;
-    printf("First Name: ");
+    uniform_int_distribution<> dist(1000,9999);
+    client_id = dist(gen);
+    system("clear");
+    printf("\n\t         New Client Information\n");
+    printf("\n\t========================================\n");
+    printf("\n\tClient ID: %d\n",client_id);
+    printf("\n\tFirst Name: ");
     getline(cin, first_name);
-    printf("Last Name: ");
+    printf("\n\tLast Name: ");
     getline(cin, last_name);
-    printf("Age: ");
+    printf("\n\tAge: ");
     cin >> age;
     cin.clear();
     cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    printf("Address: ");
+    printf("\n\tAddress: ");
     getline(cin, address);
-    printf("Balance: ");
+    printf("\n\tBalance: ");
     cin >> balance;
     cin.clear();
     cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     string sql;
-    sql = "INSERT INTO CLIENT (FIRST_NAME,LAST_NAME,AGE,ADDRESS,BALANCE) VALUES( '" + first_name + "', '" + last_name + "', " + to_string(age) + ", '" + address + "', " +
+    sql = "INSERT INTO CLIENT (PERSON_ID,FIRST_NAME,LAST_NAME,AGE,ADDRESS,BALANCE) VALUES(" + to_string(client_id) + ", '" + first_name + "', '" + last_name + "', " + to_string(age) + ", '" + address + "', " +
           to_string(balance) + ");";
 
-    exit = sqlite3_exec(DB, sql.c_str(), nullptr, nullptr, &error_message);;
+    exit = sqlite3_exec(DB, sql.c_str(), nullptr, nullptr, &error_message);
 
     if(exit != SQLITE_OK) {
         cerr << "Error Insert " << sqlite3_errmsg(DB) << endl;
         sqlite3_free(error_message);
     }
     else {
-        cout << "Records created successfully" << endl;
+        cout << "\n\tRecord created successfully" << endl;
     }
+    string query = "SELECT * FROM CLIENT;";
+    printf("\n\tPress Enter to go back to client menu");
+    cin.get();
+    sqlite3_close(DB);
 }
