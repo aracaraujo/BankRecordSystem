@@ -4,10 +4,10 @@
 #include <random>
 
 void main_menu_options();
-void search_record();
-void show_records();
-void update_record();
-void delete_record();
+void search_client();
+void show_all_clients();
+void update_client();
+void delete_client();
 int create_database();
 void create_client_table();
 void add_client();
@@ -44,6 +44,7 @@ int main() {
         cin.get();
         return -1;
     }
+
     // Creating CLIENT table. If the table already exists it will tell that the table is ready.
     create_client_table();
 
@@ -65,11 +66,11 @@ void main_menu_options(){
         printf("\n\t         Bank System Information\n");
         printf("\n\t========================================\n");
         printf("\n\tChoose between the options below:\n");
-        printf("\t1. Add record\n");
-        printf("\t2. Search record\n");
-        printf("\t3. Show records\n");
-        printf("\t4. Update record\n");
-        printf("\t5. Delete record\n");
+        printf("\t1. Add Client\n");
+        printf("\t2. Update Client\n");
+        printf("\t3. Delete Client\n");
+        printf("\t4. Search Client\n");
+        printf("\t5. Show All Clients\n");
         printf("\t6. Quit\n");
         printf("\tOption: ");
         if (!(cin >> option)) {
@@ -85,19 +86,19 @@ void main_menu_options(){
                 break;
             }
             case 2: {
-                search_record();
+                update_client();
                 break;
             }
             case 3: {
-                show_records();
+                delete_client();
                 break;
             }
             case 4: {
-                update_record();
+                search_client();
                 break;
             }
             case 5: {
-                delete_record();
+                show_all_clients();
                 break;
             }
             case 6: {
@@ -115,7 +116,7 @@ void main_menu_options(){
         }
     }
 }
-void search_record(){
+void search_client(){
     //Booking menu.
     //This menu has the reservations options. It will allow an employee to create, edit, and delete a
     //reservation. It is linked to the reservation table in the database.
@@ -147,6 +148,8 @@ void search_record(){
                 getline(cin,first_name);
                 string query = "SELECT * FROM CLIENT WHERE FIRST_NAME='"+ first_name + "';";
                 system("clear");
+                printf("\n\tSearching for: %s",first_name.c_str());
+                printf("\n\t=================================\n");
                 sqlite3_exec(DB,query.c_str(), callback, nullptr, nullptr);
                 printf("\n\tPress Enter to go back to client menu");
                 cin.get();
@@ -158,6 +161,8 @@ void search_record(){
                 getline(cin,last_name);
                 string query = "SELECT * FROM CLIENT WHERE LAST_NAME='"+ last_name + "';";
                 system("clear");
+                printf("\n\tSearching for: %s",last_name.c_str());
+                printf("\n\t=================================\n");
                 sqlite3_exec(DB,query.c_str(), callback, nullptr, nullptr);
                 printf("\n\tPress Enter to go back to client menu");
                 cin.get();
@@ -171,6 +176,8 @@ void search_record(){
                 cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                 string query = "SELECT * FROM CLIENT WHERE PERSON_ID="+ to_string(client_id) + ";";
                 system("clear");
+                printf("\n\tSearching for: %d",client_id);
+                printf("\n\t=================================\n");
                 sqlite3_exec(DB,query.c_str(), callback, nullptr, nullptr);
                 printf("\n\tPress Enter to go back to client menu");
                 cin.get();
@@ -190,21 +197,36 @@ void search_record(){
     }
     sqlite3_close(DB);
 }
-void show_records(){
+void show_all_clients(){
     //Flights menu.
     //This menu has the flight options. It will allow an admin to create, edit, and delete a
     //flight. This menu will be protected by password. It is linked to the flight table in the database.
-    bool program_controler = true;
+    system("clear");
+    string query = " SELECT * FROM CLIENT";
+    sqlite3 *DB = nullptr;
+    sqlite3_open("bank_record", &DB);
+    printf("\n\tAll Clients: \n");
+    sqlite3_exec(DB,query.c_str(), callback, nullptr, nullptr);
+    printf("\nPress Enter to go back to main menu");
+    cin.get();
+    sqlite3_close(DB);
+}
+void update_client(){
+    bool program_control = true;
     int option;
-    while (program_controler) {
+    sqlite3 *DB = nullptr;
+    sqlite3_open("bank_record", &DB);
+    while (program_control) {
         system("clear");
-        printf("\n\t           Flight Menu\n");
+        printf("\n\t           Update Client\n");
         printf("\n\t=================================\n");
         printf("\n\tChoose between the options below:\n");
-        printf("\t1. Add a new flight\n");
-        printf("\t2. Edit an existing flight\n");
-        printf("\t3. Delete a flight\n");
-        printf("\t4. Exit\n");
+        printf("\t1. Update First Name\n");
+        printf("\t2. Update Last Name\n");
+        printf("\t3. Update Age\n");
+        printf("\t4. Update Address\n");
+        printf("\t5. Update Balance\n");
+        printf("\t6. Exit\n");
         printf("\tOption: ");
         if (!(cin >> option)) {
             cout << "\nInvalid option. Try again." << endl;
@@ -215,32 +237,142 @@ void show_records(){
         cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         switch (option) {
             case 1: {
-                printf("Adding a new flight");
+                string query,new_first_name;
+                int client_id;
+                printf("\n\tClient ID of The Client To Be Update: ");
+                cin >> client_id;
+                cin.clear();
+                cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                system("clear");
+                printf("\n\tOld Record:");
+                query = "SELECT PERSON_ID,FIRST_NAME,LAST_NAME FROM CLIENT WHERE PERSON_ID="+ to_string(client_id) + ";";
+                sqlite3_exec(DB,query.c_str(), callback, nullptr, nullptr);
+                printf("\n\t=================================\n");
+                printf("\n\tNew First Name: ");
+                getline(cin,new_first_name);
+                query = "UPDATE CLIENT SET FIRST_NAME='" + new_first_name + "' WHERE PERSON_ID="+ to_string(client_id)+";";
+                sqlite3_exec(DB,query.c_str(), nullptr, nullptr, nullptr);
+                printf("\n\tRecord Updated.");
+                printf("\n\tNew Record:");
+                query = "SELECT * FROM CLIENT WHERE PERSON_ID="+ to_string(client_id)+";";
+                sqlite3_exec(DB,query.c_str(), callback, nullptr, nullptr);
+                printf("\n\tPress Enter to go back to client menu");
+                cin.get();
                 break;
             }
             case 2: {
-                printf("Editing an existing flight");
+                string query,new_last_name;
+                int client_id;
+                printf("\n\tClient ID of The Client To Be Update: ");
+                cin >> client_id;
+                cin.clear();
+                cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                system("clear");
+                printf("\n\tOld Record:");
+                query = "SELECT PERSON_ID,FIRST_NAME,LAST_NAME FROM CLIENT WHERE PERSON_ID="+ to_string(client_id) + ";";
+                sqlite3_exec(DB,query.c_str(), callback, nullptr, nullptr);
+                printf("\n\t=================================\n");
+                printf("\n\tNew Last Name: ");
+                getline(cin,new_last_name);
+                query = "UPDATE CLIENT SET LAST_NAME='" + new_last_name + "' WHERE PERSON_ID="+ to_string(client_id)+";";
+                sqlite3_exec(DB,query.c_str(), nullptr, nullptr, nullptr);
+                printf("\n\tRecord Updated.\n");
+                printf("\n\tNew Record:");
+                query = "SELECT * FROM CLIENT WHERE PERSON_ID="+ to_string(client_id)+";";
+                sqlite3_exec(DB,query.c_str(), callback, nullptr, nullptr);
+                printf("\n\tPress Enter to go back to client menu");
+                cin.get();
                 break;
             }
             case 3: {
-                printf("Deleting a flight");
+                int client_id,new_age;
+                printf("\n\tClient ID of The Client To Be Update: ");
+                cin >> client_id;
+                cin.clear();
+                cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                system("clear");
+                printf("\n\tOld Record:");
+                string query = "SELECT PERSON_ID,FIRST_NAME,LAST_NAME,AGE FROM CLIENT WHERE PERSON_ID="+ to_string(client_id) + ";";
+                sqlite3_exec(DB,query.c_str(), callback, nullptr, nullptr);
+                printf("\n\t=================================\n");
+                printf("\n\tNew Age: ");
+                cin >> new_age;
+                cin.clear();
+                cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                query = "UPDATE CLIENT SET AGE='" + to_string(new_age) + "' WHERE PERSON_ID="+ to_string(client_id)+";";
+                sqlite3_exec(DB,query.c_str(), nullptr, nullptr, nullptr);
+                printf("\n\tRecord Updated.");
+                printf("\n\tNew Record:");
+                query = "SELECT * FROM CLIENT WHERE PERSON_ID="+ to_string(client_id)+";";
+                sqlite3_exec(DB,query.c_str(), callback, nullptr, nullptr);
+                printf("\n\tPress Enter to go back to client menu");
+                cin.get();
                 break;
             }
             case 4: {
-                program_controler = false;
+                string query,new_address;
+                int client_id;
+                printf("\n\tClient ID of The Client To Be Update: ");
+                cin >> client_id;
+                cin.clear();
+                cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                system("clear");
+                printf("\n\tOld Record:");
+                query = "SELECT PERSON_ID,FIRST_NAME,LAST_NAME,ADDRESS FROM CLIENT WHERE PERSON_ID="+ to_string(client_id) + ";";
+                sqlite3_exec(DB,query.c_str(), callback, nullptr, nullptr);
+                printf("\n\t=================================\n");
+                printf("\n\tNew Address: ");
+                getline(cin,new_address);
+                query = "UPDATE CLIENT SET ADDRESS='" + new_address + "' WHERE PERSON_ID="+ to_string(client_id)+";";
+                sqlite3_exec(DB,query.c_str(), nullptr, nullptr, nullptr);
+                printf("\n\tRecord Updated.\n");
+                printf("\n\tNew Record:");
+                query = "SELECT * FROM CLIENT WHERE PERSON_ID="+ to_string(client_id)+";";
+                sqlite3_exec(DB,query.c_str(), callback, nullptr, nullptr);
+                printf("\n\tPress Enter to go back to client menu");
+                cin.get();
+                break;
+            }
+            case 5: {
+                int client_id,new_balance;
+                printf("\n\tClient ID of The Client To Be Update: ");
+                cin >> client_id;
+                cin.clear();
+                cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                system("clear");
+                printf("\n\tOld Record:");
+                string query = "SELECT PERSON_ID,FIRST_NAME,LAST_NAME,BALANCE FROM CLIENT WHERE PERSON_ID="+ to_string(client_id) + ";";
+                sqlite3_exec(DB,query.c_str(), callback, nullptr, nullptr);
+                printf("\n\t=================================\n");
+                printf("\n\tNew Balance: ");
+                cin >> new_balance;
+                cin.clear();
+                cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                query = "UPDATE CLIENT SET BALANCE='" + to_string(new_balance) + "' WHERE PERSON_ID="+ to_string(client_id)+";";
+                sqlite3_exec(DB,query.c_str(), nullptr, nullptr, nullptr);
+                printf("\n\tRecord Updated.");
+                printf("\n\tNew Record:");
+                query = "SELECT * FROM CLIENT WHERE PERSON_ID="+ to_string(client_id)+";";
+                sqlite3_exec(DB,query.c_str(), callback, nullptr, nullptr);
+                printf("\n\tPress Enter to go back to client menu");
+                cin.get();
+                break;
+            }
+            case 6: {
+                program_control = false;
                 break;
             }
             default: {
                 printf("\nThis is not a proper option.");
-                printf("\nPress Enter to go back to client menu");
+                printf("\nPress Enter to go back to the search menu");
                 cin.get();
                 continue;
             }
         }
     }
+    sqlite3_close(DB);
 }
-void update_record(){}
-void delete_record(){}
+void delete_client(){}
 int create_database(){
     int exit;
     sqlite3* DB;
