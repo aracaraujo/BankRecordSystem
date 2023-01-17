@@ -372,7 +372,37 @@ void update_client(){
     }
     sqlite3_close(DB);
 }
-void delete_client(){}
+void delete_client(){
+    int client_id;
+    string query;
+    char input;
+    system("clear");
+    sqlite3 *DB = nullptr;
+    sqlite3_open("bank_record", &DB);
+    printf("\n\t          Deleting Record\n");
+    printf("\n\t=================================\n");
+    printf("\n\tEnter The Client ID of the Record to be Deleted: ");
+    cin >> client_id;
+    cin.clear();
+    cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    query = "SELECT * FROM CLIENT WHERE PERSON_ID="+ to_string(client_id)+";";
+    printf("\n\tThe Following Record Will Be Deleted:");
+    sqlite3_exec(DB,query.c_str(),callback, nullptr, nullptr);
+    printf("\n\tWould you like to proceed?(Y/N): ");
+    cin >> input;
+    cin.clear();
+    cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    if (toupper(input) == 'Y'){
+        query = "DELETE FROM CLIENT WHERE PERSON_ID="+ to_string(client_id)+";";
+        sqlite3_exec(DB,query.c_str(), nullptr, nullptr, nullptr);
+        printf("\n\tRecord Deleted.");
+    }else{
+        printf("\n\tRecord Not Deleted.");
+    }
+    printf("\n\tPress Enter to go back to main menu");
+    cin.get();
+    sqlite3_close(DB);
+}
 int create_database(){
     int exit;
     sqlite3* DB;
