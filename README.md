@@ -22,6 +22,10 @@ which is one of the leading companies in creating IDE's.
 
 # Useful Websites
 
+The links bellow are links that helped me to build my program. On the links bellow you can find documentation 
+to install SQLite in macOS, Windows, and Linux. There’s also a tutorial that helps how to use the queries in
+SQLite.
+
 * [SQLite Installation in macOS](https://www.devdungeon.com/content/compiling-sqlite3-c)
 * [SQLite Installation in Windows and Linux](https://www.geeksforgeeks.org/introduction-to-sqlite/)
 * [SQLite with C++ Tutorial](https://www.sqlitetutorial.net)

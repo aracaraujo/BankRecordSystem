@@ -22,10 +22,11 @@ using namespace std;
 static int callback(void* data, int argc, char** argv, char** azColName){
     // This function prints on the screen the results of the queries made to the database.
     int i;
-    printf("\n\t");
 
-    for (i = 0; i< argc; i++){
+    for (i = 0; i < argc; i++) {
+        printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
     }
+
     printf("\n");
     return 0;
 }
