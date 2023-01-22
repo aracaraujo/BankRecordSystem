@@ -6,13 +6,8 @@ make my code interact with the database directly.
 
 This software is a record system of a bank. The software will store in a database clients information.
 The software allows clients to be added, updated, or deleted from the bank records. 
-{Provide a description of your software}
 
-
-{Describe your purpose for creating this software.}
-
-
-{Provide a link to your YouTube demonstration.  It should be a one minute demo of the software running and a walkthrough of the code.}
+The link bellow is a demonstration of the software running. 
 
 [Software Demo Video](http://youtube.link.goes.here)
 
@@ -29,4 +24,4 @@ which is one of the leading companies in creating IDE's.
 
 * [SQLite Installation in macOS](https://www.devdungeon.com/content/compiling-sqlite3-c)
 * [SQLite Installation in Windows and Linux](https://www.geeksforgeeks.org/introduction-to-sqlite/)
-* 
+* [SQLite with C++ Tutorial](https://www.sqlitetutorial.net)
