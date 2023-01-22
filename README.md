@@ -9,7 +9,7 @@ The software allows clients to be added, updated, or deleted from the bank recor
 
 The link bellow is a demonstration of the software running. 
 
-[Software Demo Video](https://www.youtube.com/watch?v=8UjBdMedC8A)
+[Bank Record System Demo Video](https://www.youtube.com/watch?v=8UjBdMedC8A)
 
 # Development Environment
 
