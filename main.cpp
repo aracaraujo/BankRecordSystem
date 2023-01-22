@@ -11,7 +11,6 @@ void delete_client();
 int create_database();
 void create_client_table();
 void add_client();
-void test();
 
 namespace {
     std::random_device rd;
@@ -73,7 +72,6 @@ void main_menu_options(){
         printf("\t4. Search Client\n");
         printf("\t5. Show All Clients\n");
         printf("\t6. Quit\n");
-        printf("\t7. test\n");
         printf("\tOption: ");
         if (!(cin >> option)) {
             cout << "\nInvalid option. Try again." << endl;
@@ -107,10 +105,6 @@ void main_menu_options(){
                 // Changes the program control status to then exit the loop and exit the program.
                 printf("\n\tHave a great day!");
                 program_control = false;
-                break;
-            }
-            case 7: {
-                test();
                 break;
             }
             default: {
@@ -527,26 +521,6 @@ void add_client(){
         sqlite3_exec(DB,query.c_str(), callback, nullptr, nullptr);
     }
     printf("\n\tPress Enter to go back to client menu");
-    cin.get();
-    sqlite3_close(DB);
-}
-void test(){
-    // This function prints all the records in the database.
-    system("clear");
-    // Querying all the records in the database.
-    string query = "INSERT INTO CLIENT (PERSON_ID,FIRST_NAME,LAST_NAME,AGE,ADDRESS,BALANCE) VALUES(3663, 'DAL', 'CANTANHEDE', 28, '178 UTAH', 200) ";
-    sqlite3 *DB = nullptr;
-    sqlite3_open("bank_record", &DB);
-    char* error_message;
-    sqlite3_exec(DB,query.c_str(), nullptr, nullptr, &error_message);
-    cerr << "Error open DB " << sqlite3_errmsg(DB) << endl;
-    string answer = sqlite3_errmsg(DB);
-    if (answer == "UNIQUE constraint failed: CLIENT.PERSON_ID"){
-        cout << "worked" << endl;
-    }else{
-        cout << "didn't work" << endl;
-    }
-    printf("\n\tPress Enter to go back to main menu");
     cin.get();
     sqlite3_close(DB);
 }
