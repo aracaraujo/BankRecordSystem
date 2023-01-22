@@ -23,7 +23,7 @@ static int callback(void* data, int argc, char** argv, char** azColName){
     int i;
 
     for (i = 0; i < argc; i++) {
-        printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
+        printf("\n\t%s = %s", azColName[i], argv[i] ? argv[i] : "NULL");
     }
 
     printf("\n");
